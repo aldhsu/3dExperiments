@@ -19,18 +19,20 @@
   <script src="js/OrbitControls.js"></script>
   <script src="js/underscore-min.js"></script>
   <script type="x-shader/x-vertex" id="vertexShader">
-    uniform float amplitude;
+    varying vec2 vUv;
     attribute float displacement;
     varying vec3 vNormal;
-
+    varying float vertD;
     void main() {
-
+      vertD = displacement;
+      vUv = uv;
       vNormal = normal;
 
       // multiply our displacement by
       // the amplitude. The amp will
       // get animated so we'll have
       // animated displacement
+
       vec3 newPosition =
         position + normal *
         vec3(displacement);
@@ -41,10 +43,19 @@
     }
   </script>
 
+
   <script type="x-shader/x-vertex" id="fragmentShader">
     // same name and type as VS
+    varying vec2 vUv;
     varying vec3 vNormal;
+    varying float vertD;
     uniform float red, green, blue;
+    uniform sampler2D texture1;
+
+    float random( vec3 scale, float seed ){
+      return fract( sin( dot( gl_FragCoord.xyz + seed, scale ) ) * 43758.5453 + seed ) ;
+    }
+
     void main() {
 
       // calc the dot product and clamp
@@ -54,17 +65,18 @@
 
       // ensure it's normalized
       light = normalize(light);
-
       // calculate the dot product of
       // the light to the vertex normal
-      float dProd =
-                        dot(vNormal, light);
+      float dProd = dot(vNormal, light);
+
+      // trying to display texutre
+      float r = .01 * random( vec3( 12.9898, 78.233, 151.7182 ), 0.0 );
+
+      vec2 tPos = vec2(0, 1.0 - 1.3 * vertD / 255.0 + r);
+      vec4 color = texture2D(texture1, tPos);
 
       // feed into our frag colour
-      gl_FragColor = vec4(red, // R
-                          green, // G
-                          blue, // B
-                          1.0);  // A
+      gl_FragColor = vec4(color.rgb, 1.0);
 
     }
   </script>
@@ -97,9 +109,27 @@
     blue: {
       type: 'f', // a float
       value: 0
+    },
+    texture1: {type: "t", value: THREE.ImageUtils.loadTexture( "explosion.png" )}
+  },
+  volumeMusic = [],
+  attributes2 = {
+    displacement: {
+      type: 'f',
+      value: []
     }
   },
-  volumeMusic = [];
+  uniforms2 = {
+
+    // map contains the letter map texture.
+    map: { type: "t", value: 1, texture: THREE.ImageUtils.loadTexture('assets/images/particle.png') },
+
+    // uTime is the urrent time.
+    uTime: { type: "f", value: 1.0 },
+
+    // uEffectAmount controls the amount of animation applied to the letters.
+    uEffectAmount: { type: "f", value: 0.0 }
+  };
 
   $(window).ready(function() {
     // tweening
@@ -134,12 +164,12 @@
       vertexShader: $('#vertexShader').text(),
       fragmentShader: $('#fragmentShader').text()
     });
-    material.depthTest = false;
+
 
 
     // create a sphere and assign the material
     mesh = new THREE.Mesh(
-        new THREE.IcosahedronGeometry( 20, 4 ),
+        new THREE.IcosahedronGeometry( 20, 5 ),
         material
     );
 
@@ -151,6 +181,8 @@
     mesh.dynamic = true;
     mesh.receiveShadow = true;
     mesh.castShadow = true;
+
+    // take one vector and create 2 more translated in x and y to build triangle
     var vectorFactory = function(vec0) {
       var vec1 = vec0.clone();
       var vec2 = vec0.clone();
@@ -160,7 +192,7 @@
     }
     // creating geometry for particles
     var particleGeo = new THREE.Geometry();
-    for (i = 0; i < 10; i++) {
+    for (i = 0; i < 2000; i++) {
       var particleVert0 = new THREE.Vector3();
       particleVert0.x = _.random(-1000,1000);
       particleVert0.y = _.random(-1000,1000);
@@ -177,16 +209,18 @@
     }
 
     particleMat = new THREE.ShaderMaterial({
-      uniforms: uniforms,
-      attributes: attributes,
-      vertexShader: $('#vertexShader').text()
+      uniforms: uniforms2,
+      attributes: attributes2,
+      // vertexShader: $('#vertexShader').text(),
+      // fragmentShader: $('#fragmentShader').text()
     });
-    particles = new THREE.Mesh(particleGeo, particleMat);
-    console.log(particles);
-    scene.add(particles);
 
+    particles = new THREE.Mesh(particleGeo, particleMat);
+    particles.dynamic = true;
+    scene.add(particles);
     // create the renderer and attach it to the DOM
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({ alpha: true});
+
     // renderer.shadowMapEnabled = true;
     renderer.setSize( window.innerWidth, window.innerHeight );
     controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -207,6 +241,7 @@
       // frame++;
       // mesh.rotation.x += _.random(-.1,.1);
       // mesh.rotation.y += _.random(-.1,.1);
+      attributes2.displacement.needsUpdate = true;
       attributes.displacement.needsUpdate = true;
       var values = attributes.displacement.value;
       var TimeDomain = getTimeDomain();
@@ -231,7 +266,7 @@
         // }
       }
       // console.log(volumeMusic)
-      particleMat.color = {r: 1, g: green, b: blue};
+      particleMat.color = {r: red, g: green, b: blue};
       uniforms.red.value = red;
       uniforms.green.value = green;
       uniforms.blue.value = blue;
@@ -245,6 +280,7 @@
       // Update vertices to bucket
       for (var v = 0; v < verts.length; v++) {
         attributes.displacement.value[v] = TimeDomain[(v + frame) % TimeDomain.length];
+        attributes2.displacement.value[v] += TimeDomain[(v + frame) % TimeDomain.length];
       }
       // let there be light
       renderer.render( scene, camera );
