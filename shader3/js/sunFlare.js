@@ -2,8 +2,7 @@ function sunFlare() {// Put the main code
   // // to keep track of the mouse position
   // var mouseX = 0, mouseY = 0;
 
-  var container,
-  material, camera,
+  var camera,
   // 3d objects
   material, mesh, engine = new ParticleEngine(),
   fov = 30,
@@ -32,12 +31,10 @@ function sunFlare() {// Put the main code
     texture1: {type: "t", value: THREE.ImageUtils.loadTexture( "explosion.png" )}
   },
   // may not be used
-  volumeMusic = [];
+  volumeMusic = [],
+  verts;
 
-  $(window).ready(function() {
-    // grab the container from the DOM
-    container = $("#container")[0];
-
+  var init = function() {
     //3d creation
     // create a scene
     scene = new THREE.Scene();
@@ -68,7 +65,7 @@ function sunFlare() {// Put the main code
         material
     );
 
-    var verts = mesh.geometry.vertices; 
+    verts = mesh.geometry.vertices; 
 
     //create settings for particles
     var settings = {
@@ -99,8 +96,6 @@ function sunFlare() {// Put the main code
     engine.setValues( settings );//starting the particle engine
     engine.initialize();
 
-
-
     // create the renderer and attach it to the DOM
     renderer = new THREE.WebGLRenderer();
     // renderer.shadowMapEnabled = true;
@@ -109,12 +104,11 @@ function sunFlare() {// Put the main code
     $('#container').empty();
     $('#container').append(renderer.domElement);
     scene.add( mesh );
-    render();
 
     // function beatDetection() {
         //might be used later
     // };
-
+  };
     function render() {
       //Getting data
       var values = attributes.displacement.value;
@@ -146,10 +140,11 @@ function sunFlare() {// Put the main code
       //   particleDeathAge   : 1.0;
       //   emitterDeathAge    : 120;
       // }
-
       renderer.render( scene, camera );
       requestAnimationFrame( render );
       controls.update();
-    }
-  });
-}
+    };
+
+    init();
+    render();
+  };

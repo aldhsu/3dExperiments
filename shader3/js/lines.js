@@ -29,7 +29,7 @@ function lines() {
     scene.add(camera);
 
     // Create an event listener that resizes the renderer with the browser window.
-    window.addEventListener('resize', function() {
+    $(window).on('resize', function() {
       var WIDTH = window.innerWidth,
           HEIGHT = window.innerHeight;
       renderer.setSize(WIDTH, HEIGHT);
