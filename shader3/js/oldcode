@@ -3,7 +3,7 @@ function lines() {
   // var camera;
   var lines = []; //Global array for animated elements
   var lines2 = []; //Global array for animated elements
-  colors = [[255,0,0],[0,230,255],[255,0,213]];
+  var colors = [[255,0,0],[0,230,255,],[0,255,85]];
 
   // Sets up the scene.
   function init() {
@@ -106,21 +106,7 @@ function lines() {
       var freqPoint = verticesFactory((i-(freqArray.length)/2)*2, amplitude);
       freqPoints.push(freqPoint)
     }
-    //randomize colors to music
-    // var colorArray = [];
-    // for (var j = 0; j < freqArray.length; j++) {
-    //   var amplitude = freqArray[i]/8;
-    //   var colors = [[255,0,0],[0,230,255,],[0,255,85],[255,255,255]];
-    //   if (amplitude < 50){
-    //     lineFactory(colors[0][0], colors[0][1], colors[0][2],freqPoints);
-    //   }
-    //   if (amplitude > 50 && amplitude < 150){
-    //     lineFactory(colors[3][0], colors[3][1], colors[3][2],freqPoints);
-    //   }
-    //   // lineFactory(colors[0][0], colors[0][1], colors[0][2],freqPoints);
-    // }
-
-    lineFactory(random0255(), random0255(), random0255(),freqPoints);
+    lineFactory(randomColors(), randomColors(), randomColors(),freqPoints);
   }
 
   var cameraCheck = function (){
@@ -169,15 +155,15 @@ function lines() {
     }
 
   }
-  function random0255() {
-    return _.random(0,255);
-    // return parseInt(result);
-  }
-
-  // function randomColors() {
-  //   return colors.sort( function() { return 0.4 - Math.random() } );
+  // function random0255() {
+  //   return _.random(0,255);
   //   // return parseInt(result);
   // }
+
+  function randomColors() {
+    return colors.sort( function() { return 0.4 - Math.random() } );
+    // return parseInt(result);
+  }
 
   init();
   animate();
