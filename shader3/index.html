@@ -14,6 +14,7 @@
   <button id="sunflare">S</button>
   <button id="lines">L</button>
   <button id="emitter">E</button>
+  <button id="cubeGrid">C</button>
     <form id="speedControls">
           <ul>
             <li>SpeedX: <input type="number" id="speedControlX" name="speedControlX" min="-0.9" max="6"></li>
@@ -97,6 +98,7 @@
   <script src="js/sunFlare.js"></script>
   <script src="js/lines.js"></script>
   <script src="js/emitter.js"></script>
+  <script src="js/cubeGrid.js"></script>
   <script type="text/javascript">
       var currentAnimationId = 0;
       var playing = false;
@@ -137,7 +139,11 @@
       $('#emitter').on('click', function(){
         stopPrevious();
         emitter();
-      })
+      });
+      $('#cubeGrid').on('click', function(){
+        stopPrevious();
+        cubeGrid();
+      });
 
     });
   </script>
