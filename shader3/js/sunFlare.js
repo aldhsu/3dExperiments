@@ -3,7 +3,7 @@ function sunFlare() {// Put the main code
   // var mouseX = 0, mouseY = 0;
   var camera,
   // 3d objects
-  verts, material, mesh, engine = new ParticleEngine(),
+  verts, material, mesh, cloudSystem,
   fov = 30,
   // create shader objects
   // create attributes for vertex shader
@@ -55,7 +55,7 @@ function sunFlare() {// Put the main code
       vertexShader: $('#vertexShader').text(),
       fragmentShader: $('#fragmentShader').text()
     });
-    material.depthTest = false;
+    material.depthTest = true;
 
     // create a sphere and assign the material
     mesh = new THREE.Mesh(
@@ -64,42 +64,38 @@ function sunFlare() {// Put the main code
     );
 
     verts = mesh.geometry.vertices; 
-
-    //create settings for particles
-    var settings = {
-      //where particles start
-      positionStyle    : Type.CUBE,
-      positionBase     : new THREE.Vector3( -100, -100, -100 ),//where emitter starts from
-      positionSpread   : new THREE.Vector3( 500, 500, 2000 ),//width
-
-      velocityStyle    : Type.CUBE,//this does some weird shit but can effect the speed
-      velocityBase     : new THREE.Vector3( 100, 100, 100 ),
-      velocitySpread   : new THREE.Vector3( 1000, 1005, 1000 ),
-      accelerationBase : new THREE.Vector3( 100, 100, 100 ),
-
-      particleTexture : THREE.ImageUtils.loadTexture( 'images/white.png' ),
-
-      sizeTween    : new Tween( [5], [9] ),//size of particles
-      sizeBase    : 0.9,
-      sizeSpread  : 0.5,
-      colorBase   : new THREE.Vector3(1, 1, 1), // H,S,L
-      // colorSpread : new THREE.Vector3(1, 1, 1),
-      opacityBase : 1,
-
-      particlesPerSecond : 500,
-      particleDeathAge   : 500,
-      emitterDeathAge    : 100
-     };
-
-    engine.setValues( settings );//starting the particle engine
-    engine.initialize();
+    // create cloud
+    // cloud vector builder
+    function vectorFactory(bounds) {
+      var x = Math.random() * bounds - bounds/2;
+      var z = Math.random() * bounds - bounds/2;
+      var y = Math.random() * bounds - bounds/2;
+      return new THREE.Vector3(x ,y, z);
+    }
+    // create cloudGeom
+    var points = 200000;
+    var cloudGeom = new  THREE.Geometry();
+    for (var i = 0; i < points; i++) {
+      cloudGeom.vertices.push(vectorFactory(10000))
+    }
+    // create material
+    var cloudMat = new THREE.PointCloudMaterial({
+      color: 0xFFFFFF,
+      size: 20,
+      map: THREE.ImageUtils.loadTexture(
+        "images/particle.png"
+      ),
+      blending: THREE.AdditiveBlending,
+      transparent: true    });
+    cloudSystem = new THREE.PointCloud(cloudGeom, cloudMat);
+    scene.add(cloudSystem);
+    console.log(cloudSystem);
 
     // create the renderer and attach it to the DOM
     renderer = new THREE.WebGLRenderer();
     // renderer.shadowMapEnabled = true;
     renderer.setSize( window.innerWidth, window.innerHeight );
     controls = new THREE.OrbitControls(camera, renderer.domElement);
-    $('#container').empty();
     $('#container').append(renderer.domElement);
     scene.add( mesh );
 
@@ -116,9 +112,8 @@ function sunFlare() {// Put the main code
     var red = frequency[5]/255;
     var green = frequency[7]/255;
     var blue = frequency[10]/255;
+    cloudSystem.rotation.y += 0.0001;
     //updating each element
-    //engine updater
-    engine.update( 0.01 * 1.5 );
     //vertices updater
     attributes.displacement.needsUpdate = true;
     for (var v = 0; v < verts.length; v++) {
@@ -142,7 +137,6 @@ function sunFlare() {// Put the main code
     renderer.render( scene, camera );
     currentAnimationId = requestAnimationFrame( render );
     controls.update();
-    console.log('flaring')
   };
 
   // Begin
