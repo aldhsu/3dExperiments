@@ -8,7 +8,7 @@ function lines() {
   var speedX = 0.1;
   var speedY = 0.1;
   var speedZ = 1;
-  var backgroundColor = 0xFFFFFF;
+  backgroundColorControler = 0xFFFFFF;
   // Sets up the scene.
   function init() {
 
@@ -33,7 +33,7 @@ function lines() {
     //.PerspectiveCamera (zoom, )
     camera.position.set(281.5454554532732, 20.717505604326544, 19.709799474934318);
     scene.add(camera);
-    renderer.setClearColor( backgroundColor, 0 ); // the default
+    renderer.setClearColor( backgroundColorControler, 0 ); // the default
 
     // Create an event listener that resizes the renderer with the browser window.
     $(window).on('resize', function() {
@@ -166,7 +166,7 @@ function lines() {
 
   // Renders the scene and updates the render as needed.
   function animate() {
-
+    renderer.setClearColor( backgroundColorControler, 0 ); // the default
     if (playing){
       getData();
     };
@@ -197,19 +197,26 @@ function lines() {
     // return parseInt(result);
   }
 
+
   // function randomColors() {
   //   return colors.sort( function() { return 0.4 - Math.random() } );
   //   // return parseInt(result);
   // }
 
+  $('#speedControls').on('submit', function(event) {
+    event.preventDefault();
+    speedX = parseFloat($('#speedControlX').val());
+    speedY = parseFloat($('#speedControlY').val());
+    speedZ = parseFloat($('#speedControlZ').val());
+    lineWidth = parseFloat($('#lineWidthControler').val());
+    backgroundColorControler = parseInt($('#backgroundColorControl').val().slice(1,7), 16);
+  });
 
   init();
-  backgroundColor = 0xFFFFFF;
+  // backgroundColor = 0xFFFFFF;
   lineWidth = 3;
   animate();
-  // speedX = $('#speedX').val();
-  // speedY = $('#speedY').val();
-  // speedZ = $('#speedZ').val();
+
 
 }
 
