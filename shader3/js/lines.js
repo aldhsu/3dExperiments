@@ -161,7 +161,10 @@ function lines() {
 
   // Renders the scene and updates the render as needed.
   function animate() {
-    getData();
+
+    if (playing){
+      getData();
+    };
     currentAnimationId = requestAnimationFrame(animate);
     renderer.render(scene, camera);
     controls.update();
