@@ -1,11 +1,9 @@
 function sunFlare() {// Put the main code
   // // to keep track of the mouse position
   // var mouseX = 0, mouseY = 0;
-
-  var container,
-  material, camera,
+  var camera,
   // 3d objects
-  material, mesh, engine = new ParticleEngine(),
+  verts, material, mesh, engine = new ParticleEngine(),
   fov = 30,
   // create shader objects
   // create attributes for vertex shader
@@ -34,10 +32,7 @@ function sunFlare() {// Put the main code
   // may not be used
   volumeMusic = [];
 
-  $(window).ready(function() {
-    // grab the container from the DOM
-    container = $("#container")[0];
-
+  var init = function() {
     //3d creation
     // create a scene
     scene = new THREE.Scene();
@@ -68,7 +63,7 @@ function sunFlare() {// Put the main code
         material
     );
 
-    var verts = mesh.geometry.vertices; 
+    verts = mesh.geometry.vertices; 
 
     //create settings for particles
     var settings = {
@@ -99,8 +94,6 @@ function sunFlare() {// Put the main code
     engine.setValues( settings );//starting the particle engine
     engine.initialize();
 
-
-
     // create the renderer and attach it to the DOM
     renderer = new THREE.WebGLRenderer();
     // renderer.shadowMapEnabled = true;
@@ -109,47 +102,50 @@ function sunFlare() {// Put the main code
     $('#container').empty();
     $('#container').append(renderer.domElement);
     scene.add( mesh );
-    render();
 
     // function beatDetection() {
         //might be used later
     // };
+  };
 
-    function render() {
-      //Getting data
-      var values = attributes.displacement.value;
-      var TimeDomain = getTimeDomain();
-      var frequency = getFrequencies();
-      var red = frequency[5]/255;
-      var green = frequency[7]/255;
-      var blue = frequency[10]/255;
-      //updating each element
-      //engine updater
-      engine.update( 0.01 * 1.5 );
-      //vertices updater
-      attributes.displacement.needsUpdate = true;
-      for (var v = 0; v < verts.length; v++) {
-        attributes.displacement.value[v] = TimeDomain[(v) % TimeDomain.length];
-      }
-      //future beat detection particle reactions
-      // var currentVolume = _.reduce(TimeDomain.subarray(0,300), function(memo, num) { return memo + num;}, 0)
-      // volumeMusic.push(currentVolume);
-      // if (volumeMusic.length > 30) volumeMusic.shift();
-      // if (_.max(volumeMusic) == currentVolume) {
-      //   velocityBase     : new THREE.Vector3( 1000, 1000, 1000 );
-      //   accelerationBase : new THREE.Vector3( 1000, 1000, 1000 );
-      //   velocityStyle    : 1;
-      //   engine.positionSpread.x += 100;
-      //   engine.positionSpread.y += 100;
-      //   engine.positionSpread.z += 100;
-      //   particlesPerSecond : 7000;
-      //   particleDeathAge   : 1.0;
-      //   emitterDeathAge    : 120;
-      // }
-
-      renderer.render( scene, camera );
-      requestAnimationFrame( render );
-      controls.update();
+  function render() {
+    //Getting data
+    var values = attributes.displacement.value;
+    var TimeDomain = getTimeDomain();
+    var frequency = getFrequencies();
+    var red = frequency[5]/255;
+    var green = frequency[7]/255;
+    var blue = frequency[10]/255;
+    //updating each element
+    //engine updater
+    engine.update( 0.01 * 1.5 );
+    //vertices updater
+    attributes.displacement.needsUpdate = true;
+    for (var v = 0; v < verts.length; v++) {
+      attributes.displacement.value[v] = TimeDomain[(v) % TimeDomain.length];
     }
-  });
-}
+    //future beat detection particle reactions
+    // var currentVolume = _.reduce(TimeDomain.subarray(0,300), function(memo, num) { return memo + num;}, 0)
+    // volumeMusic.push(currentVolume);
+    // if (volumeMusic.length > 30) volumeMusic.shift();
+    // if (_.max(volumeMusic) == currentVolume) {
+    //   velocityBase     : new THREE.Vector3( 1000, 1000, 1000 );
+    //   accelerationBase : new THREE.Vector3( 1000, 1000, 1000 );
+    //   velocityStyle    : 1;
+    //   engine.positionSpread.x += 100;
+    //   engine.positionSpread.y += 100;
+    //   engine.positionSpread.z += 100;
+    //   particlesPerSecond : 7000;
+    //   particleDeathAge   : 1.0;
+    //   emitterDeathAge    : 120;
+    // }
+    renderer.render( scene, camera );
+    currentAnimationId = requestAnimationFrame( render );
+    controls.update();
+    console.log('flaring')
+  };
+
+  // Begin
+  init();
+  render();
+};

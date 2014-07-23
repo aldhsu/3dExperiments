@@ -85,25 +85,38 @@
   <script src="js/sunFlare.js"></script>
   <script src="js/lines.js"></script>
   <script type="text/javascript">
+      var currentAnimationId = 0;
     $(window).ready(function(){
-      $(document).ready(function() {
-        $(".stop").on('click', function() {
-          audio0.pause();
-          audio0.currentTime = 0;
-          // Stops the frequency data from being returned.
+      // Song click listeners
+      $(".stop").on('click', function() {
+        audio0.pause();
+        audio0.currentTime = 0;
+        // Stops the frequency data from being returned.
+      });
+      $(".play").on('click', function() {
+        audio0.play();
         });
 
-        $(".play").on('click', function() {
-          audio0.play();
-          });
-        $('#lines').on('click',function(){
-          console.log('click')
-          lines();
-        });
-        $('#sunflare').click(function(){
-          sunFlare();
-        });
+      // kill old animations
+      function stopPrevious () {
+        try{
+          cancelAnimationFrame(currentAnimationId);
+        } catch(err) {
+          console.log('no id');
+        }
+      };
+      // Visual click listeners
+      $('#lines').on('click',function(){
+        console.log(currentAnimationId);
+        stopPrevious();
+        lines();
       });
+      $('#sunflare').on('click',function(){
+        console.log(currentAnimationId);
+        stopPrevious();
+        sunFlare();
+      });
+
     });
   </script>
 
