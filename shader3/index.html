@@ -13,6 +13,7 @@
   <p class="stop">Stop</p>
   <button id="sunflare">S</button>
   <button id="lines">L</button>
+  <button id="emitter">E</button>
       <div id="container"></div>
   </body>
   <script src="js/audio.js"></script>
@@ -84,6 +85,7 @@
   </script>
   <script src="js/sunFlare.js"></script>
   <script src="js/lines.js"></script>
+  <script src="js/emitter.js"></script>
   <script type="text/javascript">
       var currentAnimationId = 0;
       var playing = false;
@@ -105,6 +107,7 @@
       function stopPrevious () {
         try{
           cancelAnimationFrame(currentAnimationId);
+          $('#container').empty();
         } catch(err) {
           console.log('no id');
         }
@@ -120,6 +123,10 @@
         stopPrevious();
         sunFlare();
       });
+      $('#emitter').on('click', function(){
+        stopPrevious();
+        emitter();
+      })
 
     });
   </script>
