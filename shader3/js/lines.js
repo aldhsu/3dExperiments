@@ -4,7 +4,11 @@ function lines() {
   var lines = []; //Global array for animated elements
   var lines2 = []; //Global array for animated elements
   // colors = [[255,0,0],[255,230,255],[255,0,213]];
-
+  var lineWidth = .2;
+  var speedX = 0.1;
+  var speedY = 0.1;
+  var speedZ = 1;
+  var backgroundColor = 0xFFFFFF;
   // Sets up the scene.
   function init() {
 
@@ -29,6 +33,7 @@ function lines() {
     //.PerspectiveCamera (zoom, )
     camera.position.set(281.5454554532732, 20.717505604326544, 19.709799474934318);
     scene.add(camera);
+    renderer.setClearColor( backgroundColor, 0 ); // the default
 
     // Create an event listener that resizes the renderer with the browser window.
     $(window).on('resize', function() {
@@ -80,7 +85,7 @@ function lines() {
     var lineMaterial = new THREE.LineBasicMaterial({
       // color: "rgb("+r+","+g+","+b+")"
       color: "rgb("+r+","+g+","+b+")",
-      linewidth: 0.2
+      linewidth: lineWidth
     });
     // console.log(lineMaterial);
     var lineGeometry = new THREE.Geometry();
@@ -173,11 +178,12 @@ function lines() {
     // lines movement
     for ( var i = 0; i< lines.length; i++){
       var line = lines[i];
-      line.position.x += 2.1;
-      line.position.x += 0.1;
-      line.position.z += 1.1;
+      line.position.x += speedX;
+      line.position.y += speedY;
+      line.position.z += speedZ;
       // line.position.y += -0.1;
     }
+
 
     if(lines.length > 300){
       lastLine = lines.shift();
@@ -198,7 +204,12 @@ function lines() {
 
 
   init();
+  backgroundColor = 0xFFFFFF;
+  lineWidth = 3;
   animate();
+  // speedX = $('#speedX').val();
+  // speedY = $('#speedY').val();
+  // speedZ = $('#speedZ').val();
 
 }
 
