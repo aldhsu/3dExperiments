@@ -81,20 +81,20 @@ function lines() {
       color: "rgb("+r+","+g+","+b+")",
       linewidth: 0.2
     });
-
     var lineGeometry = new THREE.Geometry();
     lineGeometry.vertices = vertexArray;
 
     var line = new THREE.Line( lineGeometry, lineMaterial );
     scene.add( line );
     lines.push(line);
+
     return line;
   }
 
 
 
   // Get data
-  var beginVisualiser = function() {
+  var getData = function() {
     //lineFactory build at intervals
     var freqPoints = [];
     var freqArray = getTimeDomain();
@@ -132,14 +132,14 @@ function lines() {
 
   // Renders the scene and updates the render as needed.
   function animate() {
-    beginVisualiser();
-    requestAnimationFrame(animate);
-
+    getData();
+    currentAnimationId = requestAnimationFrame(animate);
+    console.log('lines');
     renderer.render(scene, camera);
     controls.update();
     cameraCheck();
 
-
+    // lines movement
     for ( var i = 0; i< lines.length; i++){
       var line = lines[i];
       line.position.x += 2.1;
@@ -154,10 +154,10 @@ function lines() {
     }
 
   }
-  // function random0255() {
-  //   return _.random(0,255);
-  //   // return parseInt(result);
-  // }
+  function random0255() {
+    return _.random(0,255);
+    // return parseInt(result);
+  }
 
   init();
   animate();
