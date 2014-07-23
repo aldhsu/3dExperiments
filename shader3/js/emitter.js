@@ -39,11 +39,11 @@ function emitter() {// Put the main code
     // function beatDetection() {
         //might be used later
     // };
-    // for (var i = 0; i < 512; i++) {
-    //   var x = Math.floor(i/16);
-    //   var y = i % 16;
-    //   emitters.push(emitterFactory(x * 20, y * 20))
-    // }
+    for (var i = 0; i < 512; i++) {
+      var x = Math.floor(i/16);
+      var y = i % 16;
+      emitters.push(emitterFactory(x * 20, y * 20))
+    }
   };
   var emitterFactory = function(x, y) {
     var settings = {
@@ -57,6 +57,7 @@ function emitter() {// Put the main code
       speedSpread    : 10,
       accelerationBase : new THREE.Vector3( 0, 0, -80  ),
       particleTexture : THREE.ImageUtils.loadTexture( 'images/white.png' ),
+      blendStyle   : THREE.AdditiveBlending,
 
       sizeTween    : new Tween( [5], [14] ),//size of particles
       sizeBase    : 0.9,
@@ -65,9 +66,9 @@ function emitter() {// Put the main code
       colorSpread : new THREE.Vector3(1, 1, 1),
       opacityBase : 1,
 
-      particlesPerSecond : 100,
-      particleDeathAge   : 5,
-      emitterDeathAge    : .1
+      particlesPerSecond : 10,
+      particleDeathAge   : 10,
+      emitterDeathAge    : 500
     };
     var engine = new ParticleEngine()
     engine.setValues(settings);//starting the particle engine
@@ -79,19 +80,27 @@ function emitter() {// Put the main code
   function render() {
     //Getting data
     var TimeDomain = getTimeDomain();
-    var frequency = getFrequencies();
-    var red = frequency[5]/255;
-    var green = frequency[7]/255;
-    var blue = frequency[10]/255;
+    var frequencies = getFrequencies();
+    var red = frequencies[5]/255;
+    var green = frequencies[7]/255;
+    var blue = frequencies[10]/255;
     // Create firework at each frequency bin
-    emitters.push(emitterFactory(TimeDomain[5], TimeDomain[0]));
+    for (var i = 0; i < frequencies.length; i++) {
+      frequency = frequencies[i];
+      if (frequency > 128) {
+        console.log("true");
+        emitters[i].speedBase = emitters[i].speedBase * -1;
+      }
+    }
+    // emitters[0].speedSpread += 1;
 
     //updating each element
     //engine updater
     for (var i = 0; i < emitters.length; i++) {
       var emitter = emitters[i];
-      emitter.update(0.01 * 5.5);
+      emitter.update(0.01 * 1.5);
     }
+    // remove dead emitters
     if (emitters.length > 512) {
       emitters.shift();
     }
