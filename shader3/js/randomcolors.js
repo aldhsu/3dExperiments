@@ -3,8 +3,6 @@ function lines() {
   // var camera;
   var lines = []; //Global array for animated elements
   var lines2 = []; //Global array for animated elements
-  // colors = [[255,0,0],[255,230,255],[255,0,213]];
-
   // Sets up the scene.
   function init() {
 
@@ -31,7 +29,7 @@ function lines() {
     scene.add(camera);
 
     // Create an event listener that resizes the renderer with the browser window.
-    $(window).on('resize', function() {
+    window.addEventListener('resize', function() {
       var WIDTH = window.innerWidth,
           HEIGHT = window.innerHeight;
       renderer.setSize(WIDTH, HEIGHT);
@@ -82,59 +80,31 @@ function lines() {
       color: "rgb("+r+","+g+","+b+")",
       linewidth: 0.2
     });
-    // console.log(lineMaterial);
+
     var lineGeometry = new THREE.Geometry();
     lineGeometry.vertices = vertexArray;
 
     var line = new THREE.Line( lineGeometry, lineMaterial );
     scene.add( line );
     lines.push(line);
-
     return line;
   }
 
 
 
   // Get data
-  var getData = function() {
+  var beginVisualiser = function() {
     //lineFactory build at intervals
     var freqPoints = [];
     var freqArray = getTimeDomain();
-    var freqData = getFrequencies();
-    var average = _.reduce(freqData, function (memo, num) {return memo + num}, 0)/freqData.length*2;
     // Get data and build vertices
     for (var i = 0; i < freqArray.length; i++) {
       var amplitude = freqArray[i]/8;
       //Don't understand how this is making the default animation change before song starts
       var freqPoint = verticesFactory((i-(freqArray.length)/2)*2, amplitude);
-      freqPoints.push(freqPoint);
-    };
-    lineFactory(freqData[0]-80, freqData[5], freqData[10]+90, freqPoints);
-    console.log(average);
-
-    // if (average < 50){
-    //   lineFactory(colors[0][0], colors[0][1], colors[0][2],freqPoints);
-    //   console.log("thisone");
-    // }   else if (average > 50 && average < 255){
-    //   lineFactory(colors[3][0], colors[3][1], colors[3][2],freqPoints);
-    //   console.log("doing");
-    // }
-    // randomize colors to music
-    // var colorArray = [];
-    // for (var j = 0; j < freqArray.length; j++) {
-    //   var amplitude = freqArray[j]/8;
-    //   var colors = [[255,0,0],[0,230,255,],[0,255,85],[255,255,255]];
-    // }
-    //   if (amplitude < 50){
-    //     lineFactory(colors[0][0], colors[0][1], colors[0][2],freqPoints);
-    //   }
-    //   if (amplitude > 50 && amplitude < 2000){
-    //     lineFactory(colors[3][0], colors[3][1], colors[3][2],freqPoints);
-    //     console.log("doing");
-    //   }
-    //   lineFactory(colors[0][0], colors[0][1], colors[0][2],freqPoints);
-
-    // lineFactory(random0255(), random0255(), random0255(),freqPoints);
+      freqPoints.push(freqPoint)
+    }
+    lineFactory(random0255(), random0255(), random0255(), freqPoints);
   }
 
   var cameraCheck = function (){
@@ -161,16 +131,14 @@ function lines() {
 
   // Renders the scene and updates the render as needed.
   function animate() {
+    beginVisualiser();
+    requestAnimationFrame(animate);
 
-    if (playing){
-      getData();
-    };
-    currentAnimationId = requestAnimationFrame(animate);
     renderer.render(scene, camera);
     controls.update();
     cameraCheck();
 
-    // lines movement
+
     for ( var i = 0; i< lines.length; i++){
       var line = lines[i];
       line.position.x += 2.1;
@@ -186,16 +154,9 @@ function lines() {
 
   }
   function random0255() {
-    // console.log("doing");
     return _.random(0,255);
     // return parseInt(result);
   }
-
-  // function randomColors() {
-  //   return colors.sort( function() { return 0.4 - Math.random() } );
-  //   // return parseInt(result);
-  // }
-
 
   init();
   animate();
